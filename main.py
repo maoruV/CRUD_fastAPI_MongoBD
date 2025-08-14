@@ -1,9 +1,9 @@
 from fastapi import FastAPI
-from config.database import db
-from videojuegos.routes import router as videojuegos_router
+from routers import videojuegos
 
 
 app = FastAPI(title="API Tienda", version="1.0.0")
 
 
-app.include_router(videojuegos_router)
+#aca incluyo mi ruta de videojuegos
+app.include_router(videojuegos.router)
