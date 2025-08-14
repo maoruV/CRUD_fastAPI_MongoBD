@@ -35,6 +35,8 @@ async def listar_videojuegos():
     videojuegos =  await db.videojuegos.find().to_list(100)
     return [videojuego_convertidor(videojuego) for videojuego in videojuegos]
 
+
+#metodo get para listar los videojuegos por id que hay en las base de datos
 @router.get("/{id}", response_model=VideoJuegoInDB)
 async def obtener_videojuego(id: str):
     if not ObjectId.is_valid(id):

@@ -1,9 +1,10 @@
 from fastapi import FastAPI
-from routers import videojuegos
+from routers import videojuegos, usuarios
 
 
-app = FastAPI(title="API Tienda", version="1.0.0")
+app = FastAPI()
 
 
 #aca incluyo mi ruta de videojuegos
 app.include_router(videojuegos.router)
+app.include_router(usuarios.router)
