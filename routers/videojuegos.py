@@ -67,25 +67,27 @@ async def listar_videojuegos(
     if min_precio is not None or max_precio is not None:
         rango = {}
         if min_precio is not None:
+            #$gte para realizar consultas que filtran el valor de un campo es >=
             rango["$gte"] = min_precio
         if max_precio is not None:
+            #$lte para realizar consultas que filtran el valor de un campo es <=
             rango["$lte"] = max_precio
         filtros["precio"] = rango
 
-    # ✅ Preparar consulta
-    cursor = db.videojuegos.find(filtros)
+    #  Preparo la consulta
+    vj_consulta = db.videojuegos.find(filtros)
 
-    # ✅ Aplicar ordenamiento si corresponde
+    #  Aplicar ordenamiento si corresponde
     if ordenar_por:
         direccion_num = 1 if direccion == "asc" else -1
-        cursor = cursor.sort(ordenar_por, direccion_num)
+        vj_consulta = vj_consulta.sort(ordenar_por, direccion_num)
 
-    # ✅ Paginación
+    #  Paginación
     total = await db.videojuegos.count_documents(filtros)
     skip = (page - 1) * limit
-    cursor = cursor.skip(skip).limit(limit)
+    vj_consulta = vj_consulta.skip(skip).limit(limit)
 
-    videojuegos = await cursor.to_list(length=limit)
+    videojuegos = await vj_consulta.to_list(length=limit)
 
     return {
         "total": total,
