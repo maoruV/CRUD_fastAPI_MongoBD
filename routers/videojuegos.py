@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from bson import ObjectId
 from database import db
 from models.videojuegos import VideoJuegoCrear, VideoJuegoActualizar, VideoJuegoInDB
@@ -28,12 +28,81 @@ async def crear_videojuego(videojuego: VideoJuegoCrear):
 
 
 #metodo get para listar los videojuegos que hay en las base de datos
-@router.get("/", response_model=list[VideoJuegoInDB])
-async def listar_videojuegos():
-    #find me trae todos los documentos de la coleccion y con to_list(100) limitamos a 100 esto evita que se carguen todos
-    #en memoria y se bloquee la aplicacion
-    videojuegos =  await db.videojuegos.find().to_list(100)
-    return [videojuego_convertidor(videojuego) for videojuego in videojuegos]
+# @router.get("/", response_model=list[VideoJuegoInDB])
+# async def listar_videojuegos():
+#     #find me trae todos los documentos de la coleccion y con to_list(100) limitamos a 100 esto evita que se carguen todos
+#     #en memoria y se bloquee la aplicacion
+#     videojuegos =  await db.videojuegos.find().to_list(100)
+#     return [videojuego_convertidor(videojuego) for videojuego in videojuegos]
+
+
+# ✅ Buscar videojuegos con filtros + rango de precios + ordenamiento + paginación
+@router.get("/", response_model=dict)
+async def listar_videojuegos(
+    nombre: str | None = Query(None, description="Buscar por nombre"),
+    plataforma: str | None = Query(None, description="Buscar por plataforma"),
+    genero: str | None = Query(None, description="Buscar por género"),
+    precio: float | None = Query(None, description="Buscar por precio exacto"),
+    min_precio: float | None = Query(None, description="Precio mínimo"),
+    max_precio: float | None = Query(None, description="Precio máximo"),
+    ordenar_por: str | None = Query(None, description="Campo para ordenar: nombre, plataforma, precio, genero"),
+    direccion: str | None = Query("asc", description="asc o desc"),
+    page: int = Query(1, ge=1, description="Número de página"),
+    limit: int = Query(10, ge=1, le=100, description="Cantidad de resultados por página (máx 100)")
+):
+    filtros = {}
+
+    if nombre:
+        filtros["nombre"] = {"$regex": nombre, "$options": "i"}
+
+    if plataforma:
+        filtros["plataforma"] = {"$regex": plataforma, "$options": "i"}
+
+    if genero:
+        filtros["genero"] = {"$regex": genero, "$options": "i"}
+
+    if precio:
+        filtros["precio"] = precio
+
+    if min_precio is not None or max_precio is not None:
+        rango = {}
+        if min_precio is not None:
+            rango["$gte"] = min_precio
+        if max_precio is not None:
+            rango["$lte"] = max_precio
+        filtros["precio"] = rango
+
+    # ✅ Preparar consulta
+    cursor = db.videojuegos.find(filtros)
+
+    # ✅ Aplicar ordenamiento si corresponde
+    if ordenar_por:
+        direccion_num = 1 if direccion == "asc" else -1
+        cursor = cursor.sort(ordenar_por, direccion_num)
+
+    # ✅ Paginación
+    total = await db.videojuegos.count_documents(filtros)
+    skip = (page - 1) * limit
+    cursor = cursor.skip(skip).limit(limit)
+
+    videojuegos = await cursor.to_list(length=limit)
+
+    return {
+        "total": total,
+        "page": page,
+        "limit": limit,
+        "pages": (total // limit) + (1 if total % limit else 0),
+        "items": [
+            {
+                "id": str(v["_id"]),
+                "nombre": v["nombre"],
+                "plataforma": v["plataforma"],
+                "precio": v["precio"],
+                "genero": v["genero"],
+            }
+            for v in videojuegos
+        ]
+    }
 
 
 #metodo get para listar los videojuegos por id que hay en las base de datos
