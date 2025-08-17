@@ -132,6 +132,8 @@ async def actualizar_videojuego(id: str, videojuego: VideoJuegoActualizar):
     if not actualizacion:
         raise HTTPException(status_code=400, detail="No se enviaron los campos para actualizar")
     
+    #"$set" se usa para modificar  o agregar campos al documento, si existe reeplaza su valor
+    #si existe lo crea con el valor especificado
     actualizado = await db.videojuegos.update_one({"_id": ObjectId(id)}, {"$set": actualizacion})
     
     if actualizado.matched_count == 0:

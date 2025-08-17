@@ -1,0 +1,89 @@
+{
+  "client": "Thunder Client",
+  "collectionName": "API Videojuegos",
+  "dateExported": "2025-08-16",
+  "version": "1.1",
+  "requests": [
+    {
+      "name": "Crear Usuario",
+      "url": "http://127.0.0.1:8000/usuarios/",
+      "method": "POST",
+      "body": {
+        "type": "json",
+        "raw": {
+          "nombre": "Xname",
+          "email": "Xn123@email.com",
+          "password": "123456"
+        }
+      }
+    },
+    {
+      "name": "Login Usuario",
+      "url": "http://127.0.0.1:8000/usuarios/login",
+      "method": "POST",
+      "body": {
+        "type": "json",
+        "raw": {
+          "email": "Xn123@email.com",
+          "password": "123456"
+        }
+      }
+    },
+    {
+      "name": "Crear Videojuego",
+      "url": "http://127.0.0.1:8000/videojuegos/",
+      "method": "POST",
+      "body": {
+        "type": "json",
+        "raw": {
+          "nombre": "The Legend of Zelda",
+          "plataforma": "Nintendo Switch",
+          "genero": "Aventura",
+          "precio": 59.99
+        }
+      }
+    },
+    {
+      "name": "Obtener Videojuegos",
+      "url": "http://127.0.0.1:8000/videojuegos/",
+      "method": "GET"
+    },
+    {
+      "name": "Buscar Videojuego por Nombre",
+      "url": "http://127.0.0.1:8000/videojuegos/buscar?nombre=Zelda",
+      "method": "GET"
+    },
+    {
+      "name": "Buscar Videojuego por Plataforma",
+      "url": "http://127.0.0.1:8000/videojuegos/buscar?plataforma=Nintendo%20Switch",
+      "method": "GET"
+    },
+    {
+      "name": "Buscar Videojuego por Género",
+      "url": "http://127.0.0.1:8000/videojuegos/buscar?genero=Aventura",
+      "method": "GET"
+    },
+    {
+      "name": "Buscar Videojuego por Precio",
+      "url": "http://127.0.0.1:8000/videojuegos/buscar?precio=59.99",
+      "method": "GET"
+    },
+    {
+      "name": "Actualizar Videojuego",
+      "url": "http://127.0.0.1:8000/videojuegos/{id}",
+      "method": "PUT",
+      "body": {
+        "type": "json",
+        "raw": {
+          "nombre": "The Legend of Zelda: Breath of the Wild",
+          "precio": 49.99
+        }
+      }
+    },
+    {
+      "name": "Eliminar Videojuego",
+      "url": "http://127.0.0.1:8000/videojuegos/{id}",
+      "method": "DELETE"
+    }
+  ]
+}
